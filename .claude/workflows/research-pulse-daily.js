@@ -56,6 +56,14 @@ const domains = [
   'Creator-economy + AI-native creator tooling launches this week',
 ]
 
+phase('Recall')
+const priorRuns = await agent(
+  `Run: node scripts/workflow-trajectory.mjs recall --workflow research-pulse-daily --limit 7\n` +
+  `Return JSON. Last 7 daily pulses tell us which signals already shipped (avoid re-flagging) and which themes keep recurring (potential blog post).`,
+  { phase: 'Recall', model: 'haiku' }
+).catch(() => ({ summary: 'cold start — no prior pulse', lessonsLearned: [] }))
+log(`Trajectory: ${priorRuns?.summary || 'cold start'}`)
+
 phase('Scan')
 const scans = await parallel(domains.map(d => () =>
   agent(
@@ -80,6 +88,16 @@ const pulse = await agent(
   `Signals: ${JSON.stringify(valid)}.`,
   { phase: 'Synthesize', schema: PULSE_SCHEMA, model: 'sonnet' }
 )
+
+phase('Record')
+const runId = args?.runId || `pulse-${args?.date || 'manual'}`
+await agent(
+  `Record this pulse run. Run: node scripts/workflow-trajectory.mjs record --workflow research-pulse-daily ` +
+  `--runId ${runId} --outcome success --findings ${allSignals.length} ` +
+  `--summary "Pulse: ${allSignals.length} signals · ${shipWorthy.length} ship-worthy · lead: ${(pulse.leadSignal || '').slice(0, 60)}" ` +
+  `--lessonsLearned "shipWorthy:${shipWorthy.length}|totalSignals:${allSignals.length}"`,
+  { phase: 'Record', model: 'haiku' }
+).catch(() => null)
 
 return {
   date: args?.date,

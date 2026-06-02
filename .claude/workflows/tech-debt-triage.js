@@ -14,6 +14,17 @@ export const meta = {
     composes: [],
     composedBy: [],
     estimatedCost: { min: 400000, max: 700000, calibratedRuns: 1, lastRun: { totalTokens: 559119, agentCount: 11, durationMs: 556903, findings: 65, doNow: 12, planSprint: 12, defer: 33 } },
+    runtime: 'hybrid',
+    adaptive: {
+      defaultIn: '90d',
+      minIn: '14d',
+      maxIn: '180d',
+      driftFunction: 'doNow + planSprint * 0.3',
+      rules: [
+        { when: 'doNow > 15', nextIn: '14d', reason: 'high debt — refactor sprint warranted' },
+        { when: 'doNow <= 5', nextIn: '180d', reason: 'low debt — semi-annual' },
+      ],
+    },
   },
 }
 
@@ -70,11 +81,20 @@ const lenses = [
   { key: 'doc-gaps', prompt: 'Missing README sections (setup/deploy/architecture), undocumented public APIs, stale comments contradicting code, missing CONTRIBUTING' },
 ]
 
+phase('Recall')
+const priorRuns = await agent(
+  `Run: node scripts/workflow-trajectory.mjs recall --workflow tech-debt-triage --limit 3\n` +
+  `Return the JSON. Lessons learned tell us which debt items were already actioned (skip rediscovery) and which patterns recur.`,
+  { phase: 'Recall', model: 'haiku' }
+).catch(() => ({ summary: 'cold start — no prior runs', lessonsLearned: [] }))
+log(`Trajectory: ${priorRuns?.summary || 'cold start'}`)
+
 phase('Scan')
 const scans = await parallel(lenses.map(l => () =>
   agent(
     `Scan repo for tech debt through the lens: "${l.key}". Focus: ${l.prompt}. ` +
-    `Return ranked findings with file:line refs and concrete evidence. Set lens="${l.key}".`,
+    `Return ranked findings with file:line refs and concrete evidence. Set lens="${l.key}". ` +
+    `Prior-run lessons (avoid re-flagging fixed items): ${JSON.stringify((priorRuns?.lessonsLearned ?? []).slice(0, 3))}`,
     { label: l.key, phase: 'Scan', schema: FINDINGS_SCHEMA, model: 'sonnet' }
   )
 ))
@@ -102,6 +122,17 @@ const proposals = await parallel(topItems.map(item => () =>
     { label: `propose:${(item.title ?? 'item').slice(0, 24)}`, phase: 'Propose', schema: PROPOSAL_SCHEMA, model: 'sonnet' }
   )
 ))
+
+phase('Record')
+const runId = args?.runId || `tech-debt-triage-${args?.date || 'manual'}`
+const lessons = (ranked.doNow ?? []).slice(0, 3).map(item => `doNow: ${item.title ?? 'item'}`).join('|')
+await agent(
+  `Record this run. Run: node scripts/workflow-trajectory.mjs record --workflow tech-debt-triage ` +
+  `--runId ${runId} --outcome success --findings ${totalFindings} ` +
+  `--summary "${totalFindings} findings — ${ranked.doNow?.length ?? 0} doNow, ${ranked.planSprint?.length ?? 0} sprint, ${ranked.defer?.length ?? 0} defer" ` +
+  `--lessonsLearned "${lessons}"`,
+  { phase: 'Record', model: 'haiku' }
+).catch(() => null)
 
 return {
   totalFindings,

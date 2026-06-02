@@ -13,6 +13,18 @@ export const meta = {
     composes: [],
     composedBy: ['release-checklist'],
     estimatedCost: { min: 120000, max: 200000, calibratedRuns: 1, lastRun: { totalTokens: 360972, agentCount: 7, durationMs: 301499, findings: 88, criticalCount: 2, highCount: 14 } },
+    runtime: 'hybrid',
+    adaptive: {
+      defaultIn: '30d',
+      minIn: '24h',
+      maxIn: '60d',
+      driftFunction: 'criticalCount * 10 + highCount * 2',
+      rules: [
+        { when: 'criticalCount > 0', nextIn: '24h', reason: 'CRITICAL CVE — accelerate immediately' },
+        { when: 'criticalCount === 0 && highCount > 10', nextIn: '7d', reason: 'high count — bi-weekly' },
+        { when: 'criticalCount === 0 && highCount <= 2', nextIn: '60d', reason: 'clean — extend cadence' },
+      ],
+    },
   },
 }
 
@@ -72,11 +84,20 @@ const lenses = [
 
 const mode = args?.mode ?? 'audit'
 
+phase('Recall')
+const priorRuns = await agent(
+  `Run: node scripts/workflow-trajectory.mjs recall --workflow dependency-audit --limit 3\n` +
+  `Return the JSON output. We use summary + lessonsLearned to inform this run (e.g. which deps tend to flake, which CVEs were ignored last time).`,
+  { phase: 'Recall', model: 'haiku' }
+).catch(() => ({ summary: 'cold start — no prior runs', lessonsLearned: [] }))
+log(`Trajectory: ${priorRuns?.summary || 'cold start'}`)
+
 phase('Scan')
 const scans = await parallel(lenses.map(l => () =>
   agent(
     `Audit deps through the lens: "${l.key}". ${l.prompt} ` +
-    `Read package.json and lockfile (pnpm-lock.yaml / package-lock.json / yarn.lock). Return ranked findings. Set lens="${l.key}".`,
+    `Read package.json and lockfile (pnpm-lock.yaml / package-lock.json / yarn.lock). Return ranked findings. Set lens="${l.key}". ` +
+    `Prior-run context (skip findings already actioned): ${JSON.stringify((priorRuns?.lessonsLearned ?? []).slice(0, 3))}`,
     { label: l.key, phase: 'Scan', schema: FINDINGS_SCHEMA, model: 'sonnet' }
   )
 ))
@@ -92,6 +113,17 @@ const ranked = await agent(
   `Count critical and high severities. Findings: ${JSON.stringify(valid)}.`,
   { phase: 'Rank', schema: RANKED_SCHEMA, model: 'opus' }
 )
+
+phase('Record')
+const runId = args?.runId || `dependency-audit-${args?.date || 'manual'}`
+const lessons = (ranked.actions ?? []).slice(0, 3).map(a => `${a.action} (${a.package})`).join('|')
+await agent(
+  `Record this run. Run: node scripts/workflow-trajectory.mjs record --workflow dependency-audit ` +
+  `--runId ${runId} --outcome ${(ranked.criticalCount ?? 0) > 0 ? 'warned' : 'success'} ` +
+  `--findings ${totalFindings} --summary "${totalFindings} findings, ${ranked.criticalCount ?? 0} critical, ${ranked.highCount ?? 0} high" ` +
+  `--lessonsLearned "${lessons}"`,
+  { phase: 'Record', model: 'haiku' }
+).catch(() => null)
 
 return {
   mode,

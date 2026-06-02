@@ -12,6 +12,7 @@ export const meta = {
     tier: 'L99',
     cadence: 'per-pr',
     portable: true,
+    runtime: 'cloud-preferred',
     composes: [],
     composedBy: ['release-checklist'],
     estimatedCost: { min: 80000, max: 350000 },

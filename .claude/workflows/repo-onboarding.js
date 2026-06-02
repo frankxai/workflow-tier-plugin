@@ -10,6 +10,7 @@ export const meta = {
     tier: 'L99',
     cadence: 'on-demand',
     portable: true,
+    runtime: 'hybrid',
     composes: [],
     composedBy: [],
     estimatedCost: { min: 120000, max: 200000, calibratedRuns: 1, lastRun: { totalTokens: 395403, agentCount: 7, durationMs: 278571 } },

@@ -53,6 +53,14 @@ const ROTATING_TOPICS = [
 const dayOfWeek = args?.dayOfWeek ?? 0
 const canonicalPrompt = args?.prompt ?? ROTATING_TOPICS[dayOfWeek % ROTATING_TOPICS.length]
 
+phase('Recall')
+const priorRuns = await agent(
+  `Run: node scripts/workflow-trajectory.mjs recall --workflow model-arena-daily --limit 7\n` +
+  `Return JSON. Prior arena outcomes tell us which tier won this prompt type before — useful context but don't bias today's judgment.`,
+  { phase: 'Recall', model: 'haiku' }
+).catch(() => ({ summary: 'cold start — no prior arena', lessonsLearned: [] }))
+log(`Trajectory: ${priorRuns?.summary || 'cold start'}`)
+
 phase('Generate')
 const tiers = ['opus', 'sonnet', 'haiku']
 const responses = await parallel(tiers.map(tier => () =>
@@ -71,6 +79,15 @@ const verdict = await agent(
   `valueDelta: is the Opus output materially better than Sonnet/Haiku, or is the cheaper tier good enough for this task class?`,
   { phase: 'Judge', schema: VERDICT_SCHEMA, model: 'opus' }
 )
+
+phase('Record')
+const runId = args?.runId || `model-arena-${args?.date || 'manual'}-${dayOfWeek}`
+await agent(
+  `Record this arena run. Run: node scripts/workflow-trajectory.mjs record --workflow model-arena-daily ` +
+  `--runId ${runId} --outcome success --summary "Topic #${dayOfWeek % ROTATING_TOPICS.length}: ${verdict.winner} won — ${(verdict.valueDelta || '').slice(0, 80)}" ` +
+  `--lessonsLearned "winner:${verdict.winner}|topic:${dayOfWeek % ROTATING_TOPICS.length}|valueDelta:${(verdict.valueDelta || 'unknown').slice(0, 60)}"`,
+  { phase: 'Record', model: 'haiku' }
+).catch(() => null)
 
 return {
   date: args?.date,

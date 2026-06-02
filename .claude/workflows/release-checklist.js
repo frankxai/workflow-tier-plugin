@@ -10,6 +10,7 @@ export const meta = {
     tier: 'L99',
     cadence: 'per-release',
     portable: true,
+    runtime: 'hybrid',
     composes: ['dependency-audit', 'pr-review-multi-perspective'],
     composedBy: [],
     estimatedCost: { min: 100000, max: 400000 },

@@ -11,6 +11,7 @@ export const meta = {
     tier: 'L99',
     cadence: 'per-incident',
     portable: true,
+    runtime: 'hybrid',
     composes: [],
     composedBy: [],
     estimatedCost: { min: 80000, max: 300000 },
