@@ -27,6 +27,9 @@
   "engines": {
     "node": ">=20.0.0"
   },
+  "bin": {
+    "create-workflow-tier": "./scripts/create-workflow-tier.mjs"
+  },
   "scripts": {
     "workflow:validate": "node scripts/workflow-validate.mjs",
     "workflow:catalog": "node scripts/workflow-catalog.mjs",
