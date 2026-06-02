@@ -1,0 +1,52 @@
+{
+  "name": "@frankxai/workflow-tier",
+  "version": "0.1.0",
+  "description": "The Workflow Tier — 8 portable multi-agent workflows + native HITL gates + trajectory memory + cost discipline. Drop into any Claude Code repo.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Frank Riemer <hi@frankx.ai> (https://frankx.ai)",
+  "homepage": "https://github.com/frankxai/workflow-tier-plugin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/frankxai/workflow-tier-plugin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/frankxai/workflow-tier-plugin/issues"
+  },
+  "keywords": [
+    "claude-code",
+    "agentic-workflows",
+    "anthropic",
+    "ccr-routines",
+    "multi-agent",
+    "schema-validation",
+    "human-in-the-loop",
+    "trajectory-memory",
+    "cost-discipline"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "workflow:validate": "node scripts/workflow-validate.mjs",
+    "workflow:catalog": "node scripts/workflow-catalog.mjs",
+    "workflow:test": "node scripts/workflow-test.mjs",
+    "workflow:docs": "node scripts/workflow-catalog.mjs write",
+    "gates:list": "node scripts/workflow-gates.mjs list",
+    "gates:pending": "node scripts/workflow-gates.mjs list --pending",
+    "gates:approve": "node scripts/workflow-gates.mjs approve",
+    "gates:reject": "node scripts/workflow-gates.mjs reject",
+    "traj:recall": "node scripts/workflow-trajectory.mjs recall",
+    "traj:record": "node scripts/workflow-trajectory.mjs record",
+    "traj:stats": "node scripts/workflow-trajectory.mjs stats",
+    "check": "npm run workflow:validate && npm run workflow:test"
+  },
+  "files": [
+    ".claude/",
+    ".claude-plugin/",
+    "scripts/",
+    "docs/",
+    "README.md",
+    "LICENSE"
+  ]
+}

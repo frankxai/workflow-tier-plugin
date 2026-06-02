@@ -1,0 +1,72 @@
+{
+  "name": "workflow-tier",
+  "version": "0.1.0",
+  "description": "The Workflow Tier — 8 portable multi-agent workflows + native human-in-the-loop gates + trajectory memory + cost-discipline doctrine. Anthropic CCR-compatible. The first workflow system that compounds across runs.",
+  "author": {
+    "name": "Frank Riemer",
+    "url": "https://frankx.ai",
+    "github": "frankxai"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/frankxai/workflow-tier-plugin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/frankxai/workflow-tier-plugin.git"
+  },
+  "keywords": [
+    "claude-code",
+    "agentic-workflows",
+    "anthropic",
+    "ccr-routines",
+    "multi-agent",
+    "schema-validation",
+    "human-in-the-loop",
+    "trajectory-memory",
+    "cost-discipline",
+    "acos"
+  ],
+  "compatibleWith": {
+    "claudeCode": ">=1.0.0",
+    "node": ">=20.0.0"
+  },
+  "provides": {
+    "workflows": [
+      "dependency-audit",
+      "incident-postmortem",
+      "model-arena-daily",
+      "pr-review-multi-perspective",
+      "release-checklist",
+      "repo-onboarding",
+      "research-pulse-daily",
+      "tech-debt-triage"
+    ],
+    "commands": ["/workflow"],
+    "scripts": {
+      "workflow:validate": "node scripts/workflow-validate.mjs",
+      "workflow:catalog": "node scripts/workflow-catalog.mjs",
+      "workflow:test": "node scripts/workflow-test.mjs",
+      "workflow:docs": "node scripts/workflow-catalog.mjs write",
+      "gates:list": "node scripts/workflow-gates.mjs list",
+      "gates:approve": "node scripts/workflow-gates.mjs approve",
+      "gates:reject": "node scripts/workflow-gates.mjs reject",
+      "traj:recall": "node scripts/workflow-trajectory.mjs recall",
+      "traj:record": "node scripts/workflow-trajectory.mjs record",
+      "traj:stats": "node scripts/workflow-trajectory.mjs stats"
+    }
+  },
+  "principles": {
+    "schemaDiscipline": "Every agent() call returning structured data uses JSON Schema. No 'model said yes but lied' failures.",
+    "costContracts": "Every workflow declares estimatedCost with calibratedRuns + lastRun data after 3+ runs. Guesses become evidence.",
+    "tierModelDown": "Bash agents use Haiku. Multi-dim review uses Sonnet. Synthesis-of-many uses Opus. Default tier inheritance is rarely correct.",
+    "compositionContract": "Portable workflows compose ONLY other portable workflows. Validator enforces.",
+    "humanGate": "Native HITL via workflow-gates substrate. The first workflow system that ships this primitive.",
+    "trajectoryMemory": "Every run learns from prior runs via workflow-trajectory. Lock-in via compounding quality.",
+    "scheduledCascade": "Daily (lite) → Weekly (deep) → Quarterly (strategic). Cost gates per cadence."
+  },
+  "calibration": {
+    "totalRuns": 5,
+    "totalCitationsBacked": 33,
+    "evidenceBriefing": "docs/EVIDENCE-BRIEFING-2026-06-02.md (in source repo frankxai/FrankX)",
+    "verdict": "SOTA on schema discipline, cost contracts, scheduled cadence, adversarial review — rare even among VC-backed agent products"
+  }
+}

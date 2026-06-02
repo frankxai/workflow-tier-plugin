@@ -1,0 +1,10 @@
+node_modules/
+.DS_Store
+*.log
+
+# Operational runtime state (per-installer, not source)
+data/workflow-gates.jsonl
+data/workflow-trajectories.jsonl
+
+# Workflow runtime cache
+.claude/projects/
