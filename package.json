@@ -2,16 +2,12 @@
   "name": "@frankxai/workflow-tier",
   "version": "0.1.0",
   "description": "The Workflow Tier — 8 portable multi-agent workflows + native HITL gates + trajectory memory + cost discipline. Drop into any Claude Code repo.",
-  "type": "module",
   "license": "MIT",
   "author": "Frank Riemer <hi@frankx.ai> (https://frankx.ai)",
   "homepage": "https://github.com/frankxai/workflow-tier-plugin",
   "repository": {
     "type": "git",
-    "url": "https://github.com/frankxai/workflow-tier-plugin.git"
-  },
-  "bugs": {
-    "url": "https://github.com/frankxai/workflow-tier-plugin/issues"
+    "url": "git+https://github.com/frankxai/workflow-tier-plugin.git"
   },
   "keywords": [
     "claude-code",
@@ -24,11 +20,25 @@
     "trajectory-memory",
     "cost-discipline"
   ],
+  "type": "module",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=20"
   },
+  "packageManager": "pnpm@11.22.0",
   "bin": {
     "create-workflow-tier": "./scripts/create-workflow-tier.mjs"
+  },
+  "files": [
+    ".claude/",
+    ".claude-plugin/",
+    "scripts/",
+    "docs/",
+    "README.md",
+    "LICENSE",
+    "!scripts/release"
+  ],
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "workflow:validate": "node scripts/workflow-validate.mjs",
@@ -42,14 +52,17 @@
     "traj:recall": "node scripts/workflow-trajectory.mjs recall",
     "traj:record": "node scripts/workflow-trajectory.mjs record",
     "traj:stats": "node scripts/workflow-trajectory.mjs stats",
-    "check": "npm run workflow:validate && npm run workflow:test"
+    "check": "npm run workflow:validate && npm run workflow:test",
+    "test": "node scripts/workflow-validate.mjs && node scripts/workflow-test.mjs",
+    "verify": "node scripts/release/verify-package.mjs --kind plugin --budget-kb 400",
+    "changeset": "changeset",
+    "release:version": "changeset version",
+    "release:publish": "changeset publish"
   },
-  "files": [
-    ".claude/",
-    ".claude-plugin/",
-    "scripts/",
-    "docs/",
-    "README.md",
-    "LICENSE"
-  ]
+  "devDependencies": {
+    "@changesets/cli": "3.0.1"
+  },
+  "bugs": {
+    "url": "https://github.com/frankxai/workflow-tier-plugin/issues"
+  }
 }
