@@ -7,15 +7,17 @@ name: CI
 on:
   pull_request:
     paths:
-      - src/**
-      - test/**
-      - scripts/release/**
+      - .changeset/**
+      - .claude-plugin/**
+      - .claude/**
+      - .github/workflows/ci.yml
+      - LICENSE
+      - README.md
+      - docs/**
       - package.json
       - pnpm-lock.yaml
-      - tsconfig.json
-      - server.json
-      - .changeset/**
-      - .github/workflows/ci.yml
+      - scripts/**
+      - scripts/release/**
   push:
     branches: [main]
     paths:
