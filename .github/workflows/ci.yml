@@ -47,7 +47,7 @@ jobs:
           node-version: 22
           package-manager-cache: false
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run build --if-present
+      - run: pnpm run --if-present build
       - run: pnpm test
       - run: pnpm run verify
       - run: pnpm pack --pack-destination artifacts
