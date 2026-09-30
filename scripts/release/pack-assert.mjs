@@ -9,6 +9,7 @@ import { readFileSync, rmSync, mkdtempSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { readTar } from './read-tar.mjs';
+import { payloadProblems, secretProblems, runTool } from './pack-rules.mjs';
 
 const args = process.argv.slice(2);
 const opt = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : d; };
@@ -22,7 +23,7 @@ const out = mkdtempSync(join(tmpdir(), 'pack-assert-'));
 
 let tgz;
 try {
-  const res = execFileSync('pnpm', ['pack', '--pack-destination', out], { stdio: ['pipe', 'pipe', 'inherit'] }).toString().trim();
+  const res = runTool(execFileSync, 'pnpm', ['pack', '--pack-destination', out], { stdio: ['pipe', 'pipe', 'inherit'] }).toString().trim();
   tgz = res.split('\n').filter(Boolean).pop().trim();
   if (!tgz.includes(out)) tgz = join(out, readdirSync(out).find(f => f.endsWith('.tgz')));
 } catch (err) {
@@ -48,11 +49,13 @@ if (kind !== 'plugin') required.push(...Object.values(pkg.bin ?? {}).map(b => b.
 for (const r of required) if (!has(r)) fail.push(`missing required entry: ${r}`);
 if (!listing.some(f => /^LICEN[CS]E/i.test(f))) fail.push('no LICENSE file in the tarball (publint errors on this)');
 if (!listing.some(f => /^README/i.test(f))) fail.push('no README in the tarball');
+fail.push(...payloadProblems(listing, pkg, kind));
 
 // 2. Forbidden content.
 const forbidden = [/^scripts\/release\//, /(^|\/)\.env($|\.)/, /(^|\/)test-output\.txt$/, /\.log$/, /(^|\/)node_modules\//, /(^|\/)\.asph-wip\//, /\.tsbuildinfo$/, /(^|\/)\.DS_Store$/, /(^|\/)\.npmrc$/];
 for (const re of forbidden) for (const f of anyMatch(re)) fail.push(`forbidden file shipped: ${f}`);
 if (kind !== 'plugin') for (const f of anyMatch(/^src\//)) { note.push(`ships source: ${f}`); break; }
+fail.push(...secretProblems(tar.map(e => ({ name: e.name.replace(/^package\//, ''), size: e.size, read: () => e.read() }))));
 
 // 3. Every bin must start with a shebang or the install is broken on POSIX.
 for (const [name, rel] of Object.entries(pkg.bin ?? {})) {
@@ -85,4 +88,4 @@ if (!args.includes('--keep')) rmSync(out, { recursive: true, force: true });
 console.log(`pack-assert: ${pkg.name}@${pkg.version} — ${listing.length} entries, ${kb} KB unpacked (budget ${budgetKB} KB)`);
 for (const n of note) console.log(`  note: ${n}`);
 if (fail.length) { console.error(`\npack-assert FAILED (${fail.length}):`); for (const f of fail) console.error(`  ✗ ${f}`); process.exit(1); }
-console.log('  ✓ entries, shebangs, protocols, size all pass');
+console.log('  ✓ entries, payload, secrets, shebangs, protocols, size all pass');

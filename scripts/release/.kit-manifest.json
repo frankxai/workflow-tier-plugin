@@ -1,9 +1,10 @@
 {
   "kitVersion": "pnpm@11.22.0",
-  "generated": "by tools/npm-release-kit/apply.mjs",
+  "generated": "by tools/npm-release-kit/apply.mjs; pack-rules hardening vendored ahead of the kit on 2026-09-30, copy these four scripts back into tools/npm-release-kit/scripts/",
   "files": {
-    "pack-assert.mjs": "e378cc33ed082eb9",
+    "pack-assert.mjs": "b745e0cf7b3614e7",
+    "pack-rules.mjs": "955670f8182d6778",
     "read-tar.mjs": "be876bb7c402e107",
-    "verify-package.mjs": "87b62b36af104ca9"
+    "verify-package.mjs": "b51915063c8e179e"
   }
 }

@@ -6,6 +6,7 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import { runTool } from './pack-rules.mjs';
 
 const args = process.argv.slice(2);
 const opt = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : d; };
@@ -23,7 +24,7 @@ const step = (label, fn) => {
     process.exit(1);
   }
 };
-const run = (cmd, argv, o = {}) => execFileSync(cmd, argv, { stdio: 'inherit', ...o });
+const run = (cmd, argv, o = {}) => runTool(execFileSync, cmd, argv, { stdio: 'inherit', ...o });
 
 step('publint — package.json against the built output', () => {
   run('pnpm', ['dlx', 'publint@0.3.24', '--strict']);
@@ -90,7 +91,7 @@ step('install scripts — nothing runs code on a stranger\'s machine unannounced
   for (const d of deps) {
     if (allow.has(d)) continue;
     let meta;
-    try { meta = JSON.parse(execFileSync('npm', ['view', d, 'scripts', '--json'], { stdio: ['pipe', 'pipe', 'ignore'] }).toString() || '{}'); } catch { continue; }
+    try { meta = JSON.parse(runTool(execFileSync, 'npm', ['view', d, 'scripts', '--json'], { stdio: ['pipe', 'pipe', 'ignore'] }).toString() || '{}'); } catch { continue; }
     const s = Array.isArray(meta) ? meta.at(-1) ?? {} : meta;
     for (const hook of ['preinstall', 'install', 'postinstall']) if (s?.[hook]) offenders.push(`${d}.${hook}`);
   }

@@ -57,6 +57,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run --if-present build
       - run: pnpm test
+      - run: node --test scripts/release/pack-rules.test.mjs
       - run: node scripts/release/sync-plugin-version.mjs --check
       # The generated version PR consumes its changesets by design; every other PR must carry one.
       - run: pnpm run verify ${{ startsWith(github.head_ref, 'changeset-release/') && '-- --skip-changeset' || '' }}
