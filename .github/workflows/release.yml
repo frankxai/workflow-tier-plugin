@@ -72,6 +72,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - uses: changesets/action/version@8488615a623b1b9c987934bb89eae8af6a946ac1 # v2.1.1
         with:
+          script: pnpm run version-packages
           pr-title: "release: version packages"
           commit-message: "release: version packages"
           pr-draft: create
@@ -98,6 +99,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run --if-present build
       - run: pnpm test
+      - run: node scripts/release/sync-plugin-version.mjs --check
       - run: pnpm run verify -- --skip-changeset
       - id: pack
         uses: changesets/action/pack@8488615a623b1b9c987934bb89eae8af6a946ac1 # v2.1.1

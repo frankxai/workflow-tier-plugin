@@ -57,6 +57,7 @@
     "verify": "node scripts/release/verify-package.mjs --kind plugin --budget-kb 400",
     "changeset": "changeset",
     "release:version": "changeset version",
+    "version-packages": "changeset version && node scripts/release/sync-plugin-version.mjs",
     "release:publish": "changeset publish"
   },
   "devDependencies": {

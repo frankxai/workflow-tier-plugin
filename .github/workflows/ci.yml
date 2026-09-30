@@ -11,13 +11,13 @@ on:
       - .claude-plugin/**
       - .claude/**
       - .github/workflows/ci.yml
+      - .github/workflows/release.yml
       - LICENSE
       - README.md
       - docs/**
       - package.json
       - pnpm-lock.yaml
       - scripts/**
-      - scripts/release/**
   # Same set as pull_request: these are the paths the published package ships or builds from.
   push:
     branches: [main]
@@ -57,7 +57,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run --if-present build
       - run: pnpm test
-      - run: pnpm run verify
+      - run: node scripts/release/sync-plugin-version.mjs --check
+      # The generated version PR consumes its changesets by design; every other PR must carry one.
+      - run: pnpm run verify ${{ startsWith(github.head_ref, 'changeset-release/') && '-- --skip-changeset' || '' }}
       - run: pnpm pack --pack-destination artifacts
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
