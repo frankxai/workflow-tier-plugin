@@ -22,8 +22,6 @@ on:
       - package.json
       - pnpm-lock.yaml
       - CHANGELOG.md
-      - src/**
-      - server.json
       - .github/workflows/release.yml
 
 permissions: {}
