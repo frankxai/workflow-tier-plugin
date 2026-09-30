@@ -18,14 +18,20 @@ on:
       - pnpm-lock.yaml
       - scripts/**
       - scripts/release/**
+  # Same set as pull_request: these are the paths the published package ships or builds from.
   push:
     branches: [main]
     paths:
-      - src/**
-      - test/**
+      - .changeset/**
+      - .claude-plugin/**
+      - .claude/**
+      - .github/workflows/ci.yml
+      - LICENSE
+      - README.md
+      - docs/**
       - package.json
       - pnpm-lock.yaml
-      - tsconfig.json
+      - scripts/**
 
 permissions:
   contents: read
