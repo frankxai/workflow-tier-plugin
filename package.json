@@ -33,7 +33,7 @@
   "scripts": {
     "workflow:validate": "node scripts/workflow-validate.mjs",
     "workflow:catalog": "node scripts/workflow-catalog.mjs",
-    "workflow:test": "node scripts/workflow-test.mjs",
+    "workflow:test": "node scripts/workflow-test.mjs && node --test scripts/workflow-test.test.mjs",
     "workflow:docs": "node scripts/workflow-catalog.mjs write",
     "gates:list": "node scripts/workflow-gates.mjs list",
     "gates:pending": "node scripts/workflow-gates.mjs list --pending",

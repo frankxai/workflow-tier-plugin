@@ -34,7 +34,7 @@ async function parseMeta(path) {
 }
 
 // Lightweight JSON Schema validator (handles enum, type, required, properties — enough for our schemas)
-function validateValue(value, schema, path = '') {
+export function validateValue(value, schema, path = '') {
   const errors = []
   if (schema.enum && !schema.enum.includes(value)) {
     errors.push(`${path || '<value>'}: expected one of [${schema.enum.join(', ')}], got ${JSON.stringify(value)}`)
@@ -130,6 +130,7 @@ async function testWorkflow(workflowFile) {
   }
 }
 
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
 const workflowFiles = (await readdir(WORKFLOWS_DIR)).filter(f => f.endsWith('.js')).sort()
 const results = []
 for (const f of workflowFiles) results.push(await testWorkflow(f))
@@ -156,4 +157,6 @@ if (mode === 'json') {
   if (missingPortable > 0) {
     console.error(`WARN: ${missingPortable} portable workflow(s) lack fixtures. Required for commercial launch.`)
   }
+}
+
 }
