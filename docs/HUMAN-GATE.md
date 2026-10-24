@@ -41,8 +41,8 @@ The gate state lives in `data/workflow-gates.jsonl` (gitignored — operational 
 |---|---|
 | `npm run gates:list` | All gates |
 | `npm run gates:pending` | Only pending gates (operator review queue) |
-| `npm run gates:approve <gateId> [--notes "..."]` | Approve — next workflow run proceeds |
-| `npm run gates:reject <gateId> [--notes "..."]` | Reject — workflow does NOT proceed |
+| `npm run gates:approve -- <gateId> [--notes "..."]` | Approve — next workflow run proceeds |
+| `npm run gates:reject -- <gateId> [--notes "..."]` | Reject — workflow does NOT proceed |
 | `node scripts/workflow-gates.mjs check <runId> <step>` | Workflow-internal check (called via Bash agent inside workflow) |
 | `node scripts/workflow-gates.mjs create --runId X --workflow Y --step Z --title "..." [--previewPath path]` | Workflow-internal create |
 
