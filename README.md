@@ -62,7 +62,7 @@ A future `npx create-workflow-tier my-repo` will collapse this to one command.
 
 ```bash
 # List all workflows + cost envelopes + composition graph
-node scripts/workflow-catalog.mjs table
+npm run workflow:catalog
 
 # Invoke a workflow in your Claude Code session
 # (your operator pastes:)

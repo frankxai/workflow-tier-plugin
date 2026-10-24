@@ -9,7 +9,7 @@ A workflow that needs human approval ends with a `humanGate` phase:
 1. Workflow generates its draft/output normally
 2. Automated gate (e.g. `@integrity-guard`) checks quality criteria
 3. If automated gate passes/warns: workflow creates a gate record and exits with `pendingApproval: true`
-4. Operator reviews preview at the path in `previewPath` and runs `pnpm gates:approve <gateId>` (or `:reject`)
+4. Operator reviews preview at the path in `previewPath` and runs `npm run gates:approve <gateId>` (or `:reject`)
 5. Next workflow invocation (manual or next scheduled run): checks gate state; if approved, performs the gated action (send newsletter, apply hub edit, etc.)
 
 The gate state lives in `data/workflow-gates.jsonl` (gitignored — operational state, not source).
@@ -39,10 +39,10 @@ The gate state lives in `data/workflow-gates.jsonl` (gitignored — operational 
 
 | Command | Purpose |
 |---|---|
-| `pnpm gates:list` | All gates |
-| `pnpm gates:list -- --pending` | Only pending gates (operator review queue) |
-| `pnpm gates:approve <gateId> [--notes "..."]` | Approve — next workflow run proceeds |
-| `pnpm gates:reject <gateId> [--notes "..."]` | Reject — workflow does NOT proceed |
+| `npm run gates:list` | All gates |
+| `npm run gates:pending` | Only pending gates (operator review queue) |
+| `npm run gates:approve <gateId> [--notes "..."]` | Approve — next workflow run proceeds |
+| `npm run gates:reject <gateId> [--notes "..."]` | Reject — workflow does NOT proceed |
 | `node scripts/workflow-gates.mjs check <runId> <step>` | Workflow-internal check (called via Bash agent inside workflow) |
 | `node scripts/workflow-gates.mjs create --runId X --workflow Y --step Z --title "..." [--previewPath path]` | Workflow-internal create |
 
