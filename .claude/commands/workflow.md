@@ -15,12 +15,12 @@ Shows the 14 workflows with tier, cadence, portability, cost envelope, compositi
 
 Run:
 ```bash
-node scripts/workflow-catalog.mjs table
+npm run workflow:catalog
 ```
 
 Or for the Mermaid composition graph:
 ```bash
-node scripts/workflow-catalog.mjs mermaid
+npm run workflow:catalog -- mermaid
 ```
 
 ### `/workflow run <name> [--args=<json>]` — invoke a workflow
@@ -48,7 +48,7 @@ Shows the calibrated `estimatedCost` per workflow with `lastRun` evidence where 
 
 Run:
 ```bash
-node scripts/workflow-catalog.mjs json | jq '[.[]|{name,cost:.acos.estimatedCost,calibratedRuns:.acos.estimatedCost.calibratedRuns}]'
+npm run -s workflow:catalog -- json | jq '[.[]|{name,cost:.acos.estimatedCost,calibratedRuns:.acos.estimatedCost.calibratedRuns}]'
 ```
 
 ### `/workflow status` — live status of in-flight workflows

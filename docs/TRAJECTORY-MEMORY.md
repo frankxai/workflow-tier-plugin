@@ -35,9 +35,9 @@ Every workflow run learns from prior runs. The lock-in mechanism that turns "sch
 
 | Command | Purpose |
 |---|---|
-| `pnpm traj:recall -- --workflow X [--limit 3]` | Get last N runs of workflow X — returns JSON for prompt injection |
-| `pnpm traj:record -- --workflow X --runId Y --outcome success [...]` | Persist a run record |
-| `pnpm traj:stats` | Table of run counts + success rates across all workflows |
+| `npm run traj:recall -- --workflow X [--limit 3]` | Get last N runs of workflow X — returns JSON for prompt injection |
+| `npm run traj:record -- --workflow X --runId Y --outcome success [...]` | Persist a run record |
+| `npm run traj:stats` | Table of run counts + success rates across all workflows |
 
 ## Workflow integration pattern
 
