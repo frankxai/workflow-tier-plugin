@@ -9,10 +9,7 @@
   },
   "license": "MIT",
   "homepage": "https://github.com/frankxai/workflow-tier-plugin",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/frankxai/workflow-tier-plugin.git"
-  },
+  "repository": "https://github.com/frankxai/workflow-tier-plugin",
   "keywords": [
     "claude-code",
     "agentic-workflows",
@@ -40,7 +37,9 @@
       "research-pulse-daily",
       "tech-debt-triage"
     ],
-    "commands": ["/workflow"],
+    "commands": [
+      "/workflow"
+    ],
     "scripts": {
       "workflow:validate": "node scripts/workflow-validate.mjs",
       "workflow:catalog": "node scripts/workflow-catalog.mjs",
